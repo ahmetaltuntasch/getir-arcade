@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="perk-effects.css" />
   <link rel="stylesheet" href="leaderboard-details.css" />
   <link rel="stylesheet" href="portal-integration.css" />
+  <link rel="stylesheet" href="mobile-fairness.css" />
 </head>
 <body>
   <div class="shell">
@@ -21,6 +22,7 @@
           <div class="health"><small>ENERJİ</small><div class="bar"><i id="health-bar"></i></div></div>
         </div>
         <canvas id="game" width="960" height="600"></canvas>
+        <div id="joystick" class="joystick" aria-label="Hareket kontrolü"><span class="joystick-knob"></span></div>
         <div id="start-screen" class="overlay">
           <div class="eyebrow">ŞEHRİN EN HIZLISI KİM?</div>
           <h1>Getir <em>Rush</em></h1>
@@ -38,6 +40,7 @@
       </aside>
     </main>
   </div>
+  <div id="orientation-screen" class="orientation-screen" aria-live="polite"><div class="phone-turn">↻</div><b>Telefonunu yatay çevir</b><p>Adil ve rahat bir oyun için Getir Rush yatay ekranda oynanır.</p></div>
   <script type="module" src="src/app.js"></script>
 </body>
 </html>

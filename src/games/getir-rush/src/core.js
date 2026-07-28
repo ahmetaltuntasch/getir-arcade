@@ -1,4 +1,13 @@
 export const RUN_DURATION = 180;
+export const WORLD_WIDTH = 960;
+export const WORLD_HEIGHT = 600;
+
+export function normalizeMovement(x=0,y=0) {
+  const length=Math.hypot(x,y);
+  if(!length)return{x:0,y:0};
+  const scale=length>1?1/length:1;
+  return{x:x*scale,y:y*scale};
+}
 export const PERKS = [
   {id:"scooter",name:"E-Scooter Hızı",emoji:"🛵",desc:"Hareket hızın %18 artar.",stat:"speed",amount:.18},
   {id:"ice",name:"Dondurma Kalkanı",emoji:"🍦",desc:"Bir sonraki çarpışmayı engeller.",stat:"shield",amount:1},
