@@ -1,0 +1,1 @@
+{"name":"depo-tetris","private":true,"type":"module","scripts":{"test":"node --test","check":"node --check src/core.js && node --check src/game.js && node --check src/app.js"}}

@@ -1,0 +1,18 @@
+import { Map, ShoppingBasket } from 'lucide-react';
+import { getirRush } from './getir-rush-meta';
+import { depoTetris } from './depo-tetris-meta';
+
+export const games = [
+  getirRush,
+  depoTetris,
+  {
+    id: 'rota-ustasi', name: 'Rota Ustası', type: 'Strateji',
+    description: 'En hızlı rotayı çiz, şehri çöz.', color: '#ff8c69',
+    ink: '#4a2116', icon: Map, ready: false, badge: 'YAKINDA',
+  },
+  {
+    id: 'sepet-savasi', name: 'Sepet Savaşı', type: 'Eşleştirme',
+    description: 'Ürünleri kap, komboları patlat.', color: '#9ac7ff',
+    ink: '#18385f', icon: ShoppingBasket, ready: false, badge: 'YAKINDA',
+  },
+];

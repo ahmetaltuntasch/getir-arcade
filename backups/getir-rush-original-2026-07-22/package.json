@@ -1,0 +1,11 @@
+{
+  "name": "getir-rush",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node --test",
+    "check": "node --check src/core.js && node --check src/game.js && node --check src/app.js"
+  }
+}

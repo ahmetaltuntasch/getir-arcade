@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getir Rush</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="perk-effects.css" />
+  <link rel="stylesheet" href="leaderboard-details.css" />
+</head>
+<body>
+  <div class="shell">
+    <header><div class="brand"><span class="brand-mark">g!</span><div><b>GETİR RUSH</b><small>3 dakikada şehri fethet</small></div></div><button id="sound" class="icon-btn">SES: AÇIK</button></header>
+    <main>
+      <section class="game-card">
+        <div id="hud" class="hud hidden">
+          <div><small>SÜRE</small><strong id="time">03:00</strong></div>
+          <div><small>SKOR</small><strong id="score">0</strong></div>
+          <div><small>TESLİMAT</small><strong id="deliveries">0</strong></div>
+          <div class="health"><small>ENERJİ</small><div class="bar"><i id="health-bar"></i></div></div>
+        </div>
+        <canvas id="game" width="960" height="600"></canvas>
+        <div id="start-screen" class="overlay">
+          <div class="eyebrow">ŞEHRİN EN HIZLISI KİM?</div>
+          <h1>Getir <em>Rush</em></h1>
+          <p>Siparişleri otomatik topla, teslimat noktalarına götür ve trafiğin arasından sıyrıl.</p>
+          <div class="how"><span><b>WASD</b> Hareket et</span><span><b>3</b> Rastgele perk</span><span><b>3:00</b> Hayatta kal</span></div>
+          <label>OYUNCU ADI<input id="player-name" maxlength="18" value="Mor Kurye" /></label>
+          <button id="start" class="primary">TURA BAŞLA <span>→</span></button>
+        </div>
+        <div id="perk-screen" class="overlay hidden"><div class="eyebrow">SEVİYE ATLADIN!</div><h2>Bir güç seç</h2><div id="perk-options" class="perk-grid"></div></div>
+        <div id="end-screen" class="overlay hidden"><div id="end-label" class="eyebrow">TUR TAMAMLANDI</div><h2 id="end-score">0 puan</h2><p id="end-copy"></p><div id="run-stats" class="run-stats"></div><button id="restart" class="primary">YENİDEN OYNA <span>↻</span></button></div>
+      </section>
+      <aside>
+        <section class="panel leaderboard"><div class="panel-head"><div><small>HAFTALIK</small><h3>Liderlik Tablosu</h3></div><span class="live">● CANLI</span></div><ol id="leaderboard"></ol></section>
+        <section class="panel active-perks"><small>BU TUR</small><h3>Aktif Güçler</h3><div id="active-perks"><p>Henüz güç seçmedin.</p></div></section>
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+.perk {
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s, background .2s, opacity .22s;
+  animation: perk-arrive .48s cubic-bezier(.2, .85, .25, 1.25) both;
+  animation-delay: var(--delay);
+}
+
+.perk:hover,
+.perk:focus-visible {
+  transform: translateY(-7px) scale(1.025);
+  outline: none;
+  box-shadow: 0 12px 35px #12051f80;
+}
+
+.perk-glow {
+  position: absolute;
+  inset: -80%;
+  background: linear-gradient(110deg, transparent 42%, #fff7b744 50%, transparent 58%);
+  transform: translateX(-45%);
+  animation: perk-shine 2.4s calc(var(--delay) + .4s) infinite;
+}
+
+.perk .emoji {
+  position: relative;
+  display: inline-block;
+  filter: drop-shadow(0 5px 0 #170b25);
+  animation: emoji-float 1.8s ease-in-out infinite;
+}
+
+.perk b,
+.perk p,
+.perk mark {
+  position: relative;
+}
+
+.perk.chosen {
+  z-index: 2;
+  pointer-events: none;
+  border-color: var(--yellow);
+  background: #ffd30026;
+  animation: perk-chosen .26s ease-out both;
+}
+
+.perk.dismissed {
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(.82);
+}
+
+@keyframes perk-arrive {
+  from { opacity: 0; transform: translateY(35px) scale(.86) rotate(-2deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes perk-shine {
+  0%, 62% { transform: translateX(-45%); }
+  100% { transform: translateX(45%); }
+}
+
+@keyframes emoji-float {
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+
+@keyframes perk-chosen {
+  50% { transform: scale(1.12); box-shadow: 0 0 45px #ffd30088; }
+  100% { transform: scale(1.04); box-shadow: 0 0 70px #ffd30055; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .perk,
+  .perk-glow,
+  .perk .emoji { animation: none; }
+}
