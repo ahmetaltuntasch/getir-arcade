@@ -1,6 +1,7 @@
 export const COLS = 10;
 export const ROWS = 16;
 export const RUN_DURATION = 180;
+export const SCORE_SCALE = 4;
 export const CATEGORIES = ['snack', 'water', 'produce', 'protein'];
 export const BONUS_TYPES = ['joker', 'bomb', 'magnet', 'freeze', 'organize', 'express'];
 
@@ -67,7 +68,14 @@ export function largestCategoryGroupTouchingRows(grid, rows) {
 export function removeCells(grid, cells) { const next = grid.map(r => [...r]); cells.forEach(([y,x]) => { if (next[y]) next[y][x] = null; }); return collapse(next); }
 export function collapse(grid) { const next = createGrid(); for (let x=0;x<COLS;x++){ const cells=[]; for(let y=ROWS-1;y>=0;y--) if(grid[y][x]) cells.push(grid[y][x]); cells.forEach((c,i)=>next[ROWS-1-i][x]=c); } return next; }
 export function emergencyClear(grid) { const occupied = grid.map((r,i)=>r.some(Boolean)?i:-1).filter(i=>i>=0).slice(0,3); return { grid: clearRows(grid, occupied), rows: occupied }; }
-export function calculateClearScore(rowCount, combo, categoryCount = 0) { return 100 * rowCount * rowCount * Math.max(1, combo) + categoryCount * 25; }
+export function calculateClearScore({ rowCount = 0, streak = 1, matchType = 'mixed', extraCells = 0, cascadeDepth = 0 } = {}) {
+  const lineFactors = [0, 1, 2.5, 4.5, 7];
+  const lineFactor = rowCount > 4 ? lineFactors[4] + (rowCount - 4) * 2 : lineFactors[Math.max(0, rowCount)];
+  const matchFactor = { mixed: 1, category: 1.35, product: 2 }[matchType] || 1;
+  const cascadeFactor = Math.min(1.75, 1 + Math.max(0, cascadeDepth) * .25);
+  const streakValue = 100 + Math.min(Math.max(1, streak), 10) * 12;
+  return Math.round((streakValue * lineFactor * matchFactor * cascadeFactor + Math.max(0, extraCells) * 15) * SCORE_SCALE);
+}
 export function dropInterval(elapsed, frozen = false) { const wave = Math.min(6, Math.floor(elapsed / 30)); return (frozen ? 1.7 : 1) * Math.max(0.18, 0.82 - wave * 0.1); }
 export function formatTime(seconds) { const s=Math.max(0,Math.ceil(seconds)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
 export function applyBonus(grid, type, context = {}) {
