@@ -7,3 +7,5 @@ dist/
 .pnpm-store/
 .nested-git-backups/
 supabase/.temp/
+output/imagegen/
+tmp/imagegen/
