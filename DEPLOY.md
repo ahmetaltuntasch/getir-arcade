@@ -1,52 +1,37 @@
-# Getir Arcade'i Render'da yayınlama
+# Getir Arcade'i yayınlama
 
-Bu proje için önerilen akış:
+Önerilen akış: `GitHub main → testler → Render otomatik deploy`.
 
-`Bilgisayar → GitHub main → GitHub testleri → Render otomatik deploy`
+## Render
 
-## İlk kurulum
+Render'da repoyu Blueprint olarak açın; kökteki `render.yaml` build, yayın klasörü, güvenlik başlıkları ve eski oyun adreslerinin yönlendirmelerini hazırlar.
 
-1. GitHub'da boş bir depo oluştur. README, `.gitignore` veya lisans ekleme.
-2. Bu klasörde Git deposunu başlat, ilk commit'i oluştur ve GitHub deposunu `origin` olarak ekle.
-3. `main` dalını GitHub'a gönder.
-4. Render ekranında **New → Blueprint** seç.
-5. GitHub hesabını bağla ve oluşturduğun depoyu seç.
-6. Render kökteki `render.yaml` dosyasını okuyarak ücretsiz `getir-arcade` Static Site'ını oluşturur.
-7. İlk GitHub kalite kontrolü başarılı olduğunda Render yayını başlatır.
+Environment bölümüne yalnız şu public değerleri ekleyin:
 
-Render'da elle Static Site oluşturmak istersen kullanılacak değerler:
-
-- Service type: `Static Site`
-- Branch: `main`
-- Build command: `pnpm install --frozen-lockfile && pnpm run build`
-- Publish directory: `dist`
-- Auto-deploy: `After CI Checks Pass`
-- Rewrite: `/*` → `/index.html`
-
-## Sonraki yayınlar
-
-Her geliştirmeden sonra:
-
-```sh
-git add .
-git commit -m "Değişikliği kısa biçimde anlat"
-git push
+```text
+VITE_SUPABASE_URL=https://PROJECT_REF.supabase.co
+VITE_SUPABASE_ANON_KEY=PUBLIC_ANON_KEY
 ```
 
-GitHub testleri ve üretim derlemesi başarılı olursa Render yeni sürümü otomatik ve kesintisiz yayınlar. Test başarısızsa mevcut çalışan sürüm yayında kalır.
+Supabase service-role key ve `RATE_LIMIT_SALT` Render'a eklenmez. Bunlar yalnız Supabase Edge Function secret'ıdır. Ayrıntılı backend adımları `supabase/README.md` içindedir.
 
-## Ortam değişkenleri
+## Canlıya alma kontrolü
 
-Supabase bağlandığında Render servisinin **Environment** bölümüne yalnızca istemcide yayınlanması güvenli `VITE_...` değerleri eklenmelidir. `SUPABASE_SERVICE_ROLE_KEY` gibi sunucu sırları Static Site'a kesinlikle eklenmemelidir; bunlar Supabase Edge Function secret olarak kalmalıdır.
+Önce yerelde:
 
-## Elle yeniden yayınlama
+```sh
+pnpm test
+pnpm run build
+```
 
-Render servisinde **Manual Deploy → Deploy latest commit** seçeneği son GitHub commit'ini yeniden yayınlar. Normal kullanımda buna gerek yoktur.
+Deploy sonrasında şunları doğrulayın:
 
-## Kontrol adresleri
+- `/` portalı açılır.
+- `/games/getir-rush/` ve `/games/depo-tetris/` doğrudan açılır ve sayfa yenilenebilir.
+- Eski `/src/games/.../index.html` adresleri temiz oyun adreslerine yönlenir.
+- Misafir oyuncu çevrimdışı oynayabilir.
+- Yeni hesap açılır, bekleyen misafir turları senkronize olur ve ortak lig görünür.
+- Yanlış şifre denemeleri sekizinci başarısız denemeden sonra 15 dakika sınırlandırılır.
+- Aynı turun ikinci gönderimi yeni skor veya XP üretmez.
 
-Yayın tamamlandıktan sonra şu üç adres açılmalıdır:
-
-- `/`
-- `/src/games/getir-rush/index.html`
-- `/src/games/depo-tetris/index.html`
+Render ortam değişkenleri yoksa portal bilinçli olarak “Ortak lig henüz yapılandırılmadı” mesajını gösterir; backend hata veriyorsa bu metin kullanılmaz.

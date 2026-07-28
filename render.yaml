@@ -6,6 +6,12 @@ services:
     staticPublishPath: ./dist
     autoDeployTrigger: checksPass
     routes:
+      - type: redirect
+        source: /src/games/getir-rush/index.html
+        destination: /games/getir-rush/
+      - type: redirect
+        source: /src/games/depo-tetris/index.html
+        destination: /games/depo-tetris/
       - type: rewrite
         source: /*
         destination: /index.html
@@ -16,6 +22,9 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=()
       - path: /assets/*
         name: Cache-Control
         value: public, max-age=31536000, immutable

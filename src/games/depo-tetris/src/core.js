@@ -2,6 +2,10 @@ export const COLS = 10;
 export const ROWS = 16;
 export const RUN_DURATION = 180;
 export const SCORE_SCALE = 4;
+export const HORIZONTAL_DAS = .12;
+export const HORIZONTAL_ARR = .055;
+export const LOCK_DELAY = .35;
+export const MAX_LOCK_RESETS = 8;
 export const CATEGORIES = ['snack', 'water', 'produce', 'protein'];
 export const BONUS_TYPES = ['joker', 'bomb', 'magnet', 'freeze', 'organize', 'express'];
 
@@ -75,6 +79,12 @@ export function calculateClearScore({ rowCount = 0, streak = 1, matchType = 'mix
   const cascadeFactor = Math.min(1.75, 1 + Math.max(0, cascadeDepth) * .25);
   const streakValue = 100 + Math.min(Math.max(1, streak), 10) * 12;
   return Math.round((streakValue * lineFactor * matchFactor * cascadeFactor + Math.max(0, extraCells) * 15) * SCORE_SCALE);
+}
+export function advanceHorizontalRepeat(heldSeconds, nextRepeatAt, dt) {
+  const held = heldSeconds + Math.max(0, dt);
+  let next = nextRepeatAt || HORIZONTAL_DAS, repeats = 0;
+  while (held >= next) { repeats++; next += HORIZONTAL_ARR; }
+  return { heldSeconds: held, nextRepeatAt: next, repeats };
 }
 export function dropInterval(elapsed, frozen = false) { const wave = Math.min(6, Math.floor(elapsed / 30)); return (frozen ? 1.7 : 1) * Math.max(0.18, 0.82 - wave * 0.1); }
 export function formatTime(seconds) { const s=Math.max(0,Math.ceil(seconds)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }

@@ -13,21 +13,19 @@ const game=new DepoTetris(canvas,{
 function start(){if(portraitQuery.matches)return;audio.unlock();$('start').classList.add('hidden');$('end').classList.add('hidden');$('hud').classList.remove('hidden');document.body.classList.add('game-running');game.start();}
 $('start-button').addEventListener('click',start);$('restart').addEventListener('click',start);
 const keyMap={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',ArrowUp:'rotate',w:'rotate',W:'rotate',' ':'drop'};
-const heldKeys=new Map();
-function releaseKey(key){const held=heldKeys.get(key);if(!held)return;clearTimeout(held.delay);clearInterval(held.repeat);heldKeys.delete(key);}
-function releaseKeyboard(){for(const key of [...heldKeys.keys()])releaseKey(key);game.setSoftDrop(false);}
-addEventListener('keydown',e=>{if(['ArrowDown','s','S'].includes(e.key)){e.preventDefault();game.setSoftDrop(true);return;}const action=keyMap[e.key];if(!action)return;e.preventDefault();if(e.repeat||heldKeys.has(e.key))return;game.command(action);if(!['left','right'].includes(action))return;const held={delay:null,repeat:null};held.delay=setTimeout(()=>{held.repeat=setInterval(()=>game.command(action),70);game.command(action);},135);heldKeys.set(e.key,held);});
-addEventListener('keyup',e=>{releaseKey(e.key);if(['ArrowDown','s','S'].includes(e.key))game.setSoftDrop(false);});addEventListener('blur',releaseKeyboard);
-document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();game.command(b.dataset.action);}));
-let touch=null;canvas.addEventListener('touchstart',e=>{const t=e.touches[0];touch={x:t.clientX,y:t.clientY};},{passive:true});canvas.addEventListener('touchend',e=>{if(!touch)return;const t=e.changedTouches[0],dx=t.clientX-touch.x,dy=t.clientY-touch.y;if(Math.abs(dx)>35)game.command(dx>0?'right':'left');else if(dy>45)game.command('drop');else game.command('rotate');touch=null;},{passive:true});
+const horizontalKeys=new Map(),downKeys=new Set();
+function currentHorizontal(){const values=[...horizontalKeys.values()];return values.at(-1)||0;}
+function releaseKeyboard(){horizontalKeys.clear();downKeys.clear();game.resetInput();}
+addEventListener('keydown',e=>{if(['ArrowDown','s','S'].includes(e.key)){e.preventDefault();downKeys.add(e.key);game.setSoftDrop(true);return;}const action=keyMap[e.key];if(!action)return;e.preventDefault();if(e.repeat)return;if(action==='left'||action==='right'){horizontalKeys.delete(e.key);horizontalKeys.set(e.key,action==='left'?-1:1);game.setHorizontal(currentHorizontal());}else if(action==='rotate')game.queueRotate();else game.hardDrop();});
+addEventListener('keyup',e=>{if(horizontalKeys.delete(e.key))game.setHorizontal(currentHorizontal());if(downKeys.delete(e.key)&&!downKeys.size)game.setSoftDrop(false);});addEventListener('blur',releaseKeyboard);
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();if(b.dataset.action==='rotate')game.queueRotate();else game.hardDrop();}));
+let touch=null;canvas.addEventListener('touchstart',e=>{const t=e.touches[0];touch={x:t.clientX,y:t.clientY};},{passive:true});canvas.addEventListener('touchend',e=>{if(!touch)return;const t=e.changedTouches[0],dx=t.clientX-touch.x,dy=t.clientY-touch.y;if(Math.abs(dx)>35){game.setHorizontal(dx>0?1:-1);game.setHorizontal(0);}else if(dy>45)game.hardDrop();else game.queueRotate();touch=null;},{passive:true});
 const portraitQuery=matchMedia('(pointer: coarse) and (orientation: portrait)');
 function syncOrientation(){document.body.classList.toggle('needs-landscape',portraitQuery.matches);game.setOrientationPaused(portraitQuery.matches&&game.running);}
 portraitQuery.addEventListener?.('change',syncOrientation);syncOrientation();
-const joystick=$('joystick'),knob=joystick.querySelector('.joystick-knob');let joystickPointer=null,repeatTimer=null,currentDirection=0;
-function stopRepeat(){if(repeatTimer)clearInterval(repeatTimer);repeatTimer=null;currentDirection=0;}
-function setJoystickDirection(direction){if(direction===currentDirection)return;stopRepeat();currentDirection=direction;if(!direction)return;game.command(direction<0?'left':'right');repeatTimer=setInterval(()=>game.command(direction<0?'left':'right'),75);}
-function moveJoystick(e){const r=joystick.getBoundingClientRect(),radius=r.width*.34,dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),distance=Math.hypot(dx,dy),scale=distance>radius?radius/distance:1,x=dx*scale,y=dy*scale,deadzone=radius*.18;knob.style.transform=`translate(${x}px,${y}px)`;setJoystickDirection(Math.abs(x)>deadzone&&Math.abs(x)>Math.abs(y)*.65?Math.sign(x):0);game.setSoftDrop(y>deadzone&&Math.abs(y)>Math.abs(x)*.65);}
-function releaseJoystick(e){if(joystickPointer!==null&&e?.pointerId!==undefined&&e.pointerId!==joystickPointer)return;joystickPointer=null;stopRepeat();knob.style.transform='translate(0,0)';game.setSoftDrop(false);}
+const joystick=$('joystick'),knob=joystick.querySelector('.joystick-knob');let joystickPointer=null;
+function moveJoystick(e){const r=joystick.getBoundingClientRect(),radius=r.width*.34,dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),distance=Math.hypot(dx,dy),scale=distance>radius?radius/distance:1,x=dx*scale,y=dy*scale,deadzone=radius*.18;knob.style.transform=`translate(${x}px,${y}px)`;game.setHorizontal(Math.abs(x)>deadzone&&Math.abs(x)>Math.abs(y)*.65?Math.sign(x):0);game.setSoftDrop(y>deadzone&&Math.abs(y)>Math.abs(x)*.65);}
+function releaseJoystick(e){if(joystickPointer!==null&&e?.pointerId!==undefined&&e.pointerId!==joystickPointer)return;joystickPointer=null;knob.style.transform='translate(0,0)';game.setHorizontal(0);game.setSoftDrop(false);}
 joystick.addEventListener('pointerdown',e=>{if(joystickPointer!==null)return;joystickPointer=e.pointerId;joystick.setPointerCapture(e.pointerId);moveJoystick(e);});
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joystickPointer)moveJoystick(e);});
 joystick.addEventListener('pointerup',releaseJoystick);joystick.addEventListener('pointercancel',releaseJoystick);joystick.addEventListener('lostpointercapture',releaseJoystick);

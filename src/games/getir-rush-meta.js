@@ -10,5 +10,5 @@ export const getirRush = {
   icon: Flame,
   ready: true,
   badge: 'ŞİMDİ OYNA',
-  route: '/src/games/getir-rush/index.html',
+  route: '/games/getir-rush/',
 };

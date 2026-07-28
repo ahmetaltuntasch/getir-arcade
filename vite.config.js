@@ -8,8 +8,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         arcade: resolve(import.meta.dirname, 'index.html'),
-        'getir-rush': resolve(import.meta.dirname, 'src/games/getir-rush/index.html'),
-        'depo-tetris': resolve(import.meta.dirname, 'src/games/depo-tetris/index.html'),
+        'getir-rush': resolve(import.meta.dirname, 'games/getir-rush/index.html'),
+        'depo-tetris': resolve(import.meta.dirname, 'games/depo-tetris/index.html'),
       },
     },
   },

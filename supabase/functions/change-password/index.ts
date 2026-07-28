@@ -1,2 +1,2 @@
-import{admin,caller,cors,json}from'../_shared/arcade.ts';
+import { admin, caller, cors, json } from '../_shared/arcade.ts';
 Deno.serve(async req=>{if(req.method==='OPTIONS')return new Response('ok',{headers:cors});try{const user=await caller(req);if(!user)return json({error:'Oturum gerekli'},401);const{password}=await req.json();if(String(password||'').length<8)return json({error:'Şifre en az 8 karakter olmalı'},400);const db=admin(),updated=await db.auth.admin.updateUserById(user.id,{password});if(updated.error)return json({error:'Şifre değiştirilemedi'},400);await db.from('profiles').update({must_change_password:false}).eq('id',user.id);return json({ok:true});}catch{return json({error:'Şifre değiştirilemedi'},500)}});
