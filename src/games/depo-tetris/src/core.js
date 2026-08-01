@@ -5,6 +5,7 @@ export const SCORE_SCALE = 4;
 export const HORIZONTAL_DAS = .12;
 export const HORIZONTAL_ARR = .055;
 export const LOCK_DELAY = .35;
+export const SOFT_DROP_LOCK_DELAY = .08;
 export const MAX_LOCK_RESETS = 8;
 export const CATEGORIES = ['snack', 'water', 'produce', 'protein'];
 export const BONUS_TYPES = ['joker', 'bomb', 'magnet', 'freeze', 'organize', 'express'];
