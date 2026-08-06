@@ -10,14 +10,16 @@
   <body>
     <div class="warehouse">
       <header>
-        <a href="/" class="back">← ARCADE</a>
         <div class="logo">
           <span>g!</span>
           <div>
             <b>DEPO TETRİS</b><small>Rafları diz, siparişleri hazırla</small>
           </div>
         </div>
-        <button id="sound">SES: AÇIK</button>
+        <div class="header-actions">
+          <a href="/" class="back">← ARCADE</a>
+          <button id="sound">SES: AÇIK</button>
+        </div>
       </header>
       <main>
         <section class="game-wrap">
@@ -42,16 +44,22 @@
             ><button data-action="drop" class="drop">BIRAK ↓</button>
           </div>
           <div id="start" class="overlay">
-            <span class="tag">GETİR DEPOSUNA HOŞ GELDİN</span>
-            <div id="player-name" class="player-name" aria-live="polite"></div>
+            <div class="eyebrow">DEPO OPERASYONUNDA EN İYİ KİM?</div>
             <h1>Rafları<br /><em>hazırla!</em></h1>
             <p>
               Ürünleri yerleştir, dolan rafları picker'larla siparişe gönder.
             </p>
-            <div class="keys">
-              <span>← → Hareket</span><span>↓ Hızlandır</span
-              ><span>↑ Döndür</span><span>Boşluk Bırak</span>
+            <div class="how">
+              <span><b>← →</b> Hareket et</span><span><b>↓</b> Hızlandır</span
+              ><span><b>↑</b> Döndür</span><span><b>BOŞLUK</b> Bırak</span>
             </div>
+            <label
+              >OYUNCU ADI<input
+                id="player-name"
+                maxlength="20"
+                readonly
+                value="Misafir"
+            /></label>
             <button id="start-button" class="primary">
               VARDİYAYI BAŞLAT →
             </button>

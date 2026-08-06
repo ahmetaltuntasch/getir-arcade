@@ -5,7 +5,8 @@ import { getPlayerIdentity } from '../../../shared/platform/player.js';
 const $=id=>document.getElementById(id);const canvas=$('game');
 const player=getPlayerIdentity(arcadeStore);
 const playerName=$('player-name');
-playerName.textContent=player.account?`OYUNCU · ${player.name}`:`MİSAFİR · ${player.name}`;
+playerName.value=player.name;
+playerName.title=player.account?"Hesap nickname'in kullanılıyor.":"Misafir adı bu oturum için rastgele seçildi.";
 const audio=new GameAudio();
 const game=new DepoTetris(canvas,{
   hud:s=>{$('time').textContent=s.time;$('score').textContent=s.score.toLocaleString('tr-TR');$('rows').textContent=s.rows;$('products').textContent=s.products;$('power').style.width=`${s.power*100}%`;},
