@@ -2,42 +2,338 @@ import { RushGame } from "./game.js";
 import { formatTime } from "./core.js";
 import { arcadeStore } from "../../../shared/platform/store.js";
 import { getPlayerIdentity } from "../../../shared/platform/player.js";
+import { backendAvailable, getLeaderboard, syncRuns } from "../../../shared/platform/api.js";
 
-const $=s=>document.querySelector(s);const screens=["#start-screen","#perk-screen","#end-screen"];
-const show=id=>{screens.forEach(s=>$(s).classList.toggle("hidden",s!==id));};
-class SoundEngine{
-  constructor(){this.enabled=true;this.ctx=null;this.master=null;}
-  ensure(){if(!this.enabled)return false;if(!this.ctx){this.ctx=new AudioContext();this.master=this.ctx.createGain();this.master.gain.value=.16;this.master.connect(this.ctx.destination);}if(this.ctx.state==="suspended")this.ctx.resume();return true;}
-  tone(freq,duration=.12,type="square",delay=0,volume=.5,slide=0){if(!this.ensure())return;const t=this.ctx.currentTime+delay,o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,freq+slide),t+duration);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(volume,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+duration+.02);}
-  play(name){if(!this.enabled)return;const notes={start:[[330,.09,"square",0,.35,180],[550,.13,"square",.08,.3,220]],pickup:[[660,.08,"square",0,.35,160]],delivery:[[523,.09,"square",0,.4,80],[784,.13,"square",.08,.35,120]],hit:[[120,.18,"sawtooth",0,.45,-70]],shield:[[880,.08,"square",0,.35,-180],[1100,.12,"sine",.05,.25,-250]],perkOpen:[[392,.1,"sine",0,.3,80],[523,.12,"sine",.08,.35,120],[659,.18,"sine",.16,.4,180]],perkChoose:[[523,.08,"square",0,.35,120],[784,.1,"square",.06,.4,180],[1047,.16,"sine",.12,.35,220]],rush:[[110,.22,"sawtooth",0,.4,100],[165,.22,"sawtooth",.18,.4,140],[220,.3,"square",.36,.35,220]],complete:[[523,.13,"square",0,.3,80],[659,.13,"square",.12,.3,100],[784,.28,"sine",.24,.35,180]],energy:[[220,.16,"square",0,.3,-60],[165,.22,"sawtooth",.15,.3,-70]]};for(const args of notes[name]||[])this.tone(...args);}
-  toggle(){this.enabled=!this.enabled;if(this.enabled)this.play("start");return this.enabled;}
+const $ = (s) => document.querySelector(s);
+const screens = ["#start-screen", "#perk-screen", "#end-screen"];
+const show = (id) => {
+  screens.forEach((s) => $(s).classList.toggle("hidden", s !== id));
+};
+class SoundEngine {
+  constructor() {
+    this.enabled = true;
+    this.ctx = null;
+    this.master = null;
+  }
+  ensure() {
+    if (!this.enabled) return false;
+    if (!this.ctx) {
+      this.ctx = new AudioContext();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.16;
+      this.master.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === "suspended") this.ctx.resume();
+    return true;
+  }
+  tone(
+    freq,
+    duration = 0.12,
+    type = "square",
+    delay = 0,
+    volume = 0.5,
+    slide = 0,
+  ) {
+    if (!this.ensure()) return;
+    const t = this.ctx.currentTime + delay,
+      o = this.ctx.createOscillator(),
+      g = this.ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (slide)
+      o.frequency.exponentialRampToValueAtTime(
+        Math.max(40, freq + slide),
+        t + duration,
+      );
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(volume, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    o.connect(g);
+    g.connect(this.master);
+    o.start(t);
+    o.stop(t + duration + 0.02);
+  }
+  play(name) {
+    if (!this.enabled) return;
+    const notes = {
+      start: [
+        [330, 0.09, "square", 0, 0.35, 180],
+        [550, 0.13, "square", 0.08, 0.3, 220],
+      ],
+      pickup: [[660, 0.08, "square", 0, 0.35, 160]],
+      delivery: [
+        [523, 0.09, "square", 0, 0.4, 80],
+        [784, 0.13, "square", 0.08, 0.35, 120],
+      ],
+      hit: [[120, 0.18, "sawtooth", 0, 0.45, -70]],
+      shield: [
+        [880, 0.08, "square", 0, 0.35, -180],
+        [1100, 0.12, "sine", 0.05, 0.25, -250],
+      ],
+      perkOpen: [
+        [392, 0.1, "sine", 0, 0.3, 80],
+        [523, 0.12, "sine", 0.08, 0.35, 120],
+        [659, 0.18, "sine", 0.16, 0.4, 180],
+      ],
+      perkChoose: [
+        [523, 0.08, "square", 0, 0.35, 120],
+        [784, 0.1, "square", 0.06, 0.4, 180],
+        [1047, 0.16, "sine", 0.12, 0.35, 220],
+      ],
+      rush: [
+        [110, 0.22, "sawtooth", 0, 0.4, 100],
+        [165, 0.22, "sawtooth", 0.18, 0.4, 140],
+        [220, 0.3, "square", 0.36, 0.35, 220],
+      ],
+      complete: [
+        [523, 0.13, "square", 0, 0.3, 80],
+        [659, 0.13, "square", 0.12, 0.3, 100],
+        [784, 0.28, "sine", 0.24, 0.35, 180],
+      ],
+      energy: [
+        [220, 0.16, "square", 0, 0.3, -60],
+        [165, 0.22, "sawtooth", 0.15, 0.3, -70],
+      ],
+    };
+    for (const args of notes[name] || []) this.tone(...args);
+  }
+  toggle() {
+    this.enabled = !this.enabled;
+    if (this.enabled) this.play("start");
+    return this.enabled;
+  }
 }
-const audio=new SoundEngine();
-const player=getPlayerIdentity(arcadeStore),playerNameInput=$("#player-name");
-playerNameInput.value=player.name;
-playerNameInput.readOnly=player.account;
-playerNameInput.title=player.account?"Hesap nickname'in kullanılıyor.":"Misafir adı bu oturum için rastgele seçildi.";
-const defaults=[{name:"Hızlı Panda",score:4820,deliveries:31,time:180,perks:5},{name:"Mor Şimşek",score:4310,deliveries:27,time:180,perks:5},{name:"Gece Kuryesi",score:3890,deliveries:24,time:164,perks:4},{name:"Rota Ustası",score:3450,deliveries:21,time:151,perks:4}];
-const loadScores=()=>{try{return JSON.parse(localStorage.getItem("getir-rush-scores"))||defaults}catch{return defaults}};
-const saveRun=run=>{const scores=loadScores();scores.push({name:$("#player-name").value.trim()||"Anonim Kurye",score:run.score,deliveries:run.deliveries,time:run.time,perks:run.perks.length,reason:run.reason,date:Date.now()});scores.sort((a,b)=>b.score-a.score);localStorage.setItem("getir-rush-scores",JSON.stringify(scores.slice(0,20)));arcadeStore?.recordRun({clientRunId:`rush-${run.seed}`,gameId:'getir-rush',score:run.score,durationSeconds:run.time,completedAt:new Date().toISOString(),metrics:{deliveries:run.deliveries,perks:run.perks.length,reason:run.reason}});renderScores();};
-function renderScores(){const scores=loadScores().sort((a,b)=>b.score-a.score).slice(0,8);$("#leaderboard").innerHTML=scores.map((s,i)=>`<li><span class="rank">${i+1}</span><div class="player-cell"><span class="avatar">${["🏆","⚡","🛵","📦","☕"][i%5]}</span><div><b>${escapeHtml(s.name)}</b><small class="run-detail"><span>📦 ${s.deliveries??"—"} teslimat</span><span>⏱ ${Number.isFinite(s.time)?formatTime(s.time):"—"}</span><span>⚡ ${s.perks??"—"} güç</span></small></div></div><strong>${s.score.toLocaleString("tr-TR")}</strong></li>`).join("");}
-function escapeHtml(v){const d=document.createElement("div");d.textContent=v;return d.innerHTML;}
-function renderPerks(perks){$("#active-perks").innerHTML=perks.length?perks.map((p,i)=>`<div class="perk-pill"><span>${p.emoji}</span>${p.name}<b>${perks.filter(x=>x.id===p.id).length}x</b></div>`).join(""):"<p>Henüz güç seçmedin.</p>";}
-const game=new RushGame($("#game"),{
-  sound:name=>audio.play(name),
-  update:s=>{$("#time").textContent=formatTime(s.time);$("#score").textContent=s.score.toLocaleString("tr-TR");$("#deliveries").textContent=s.deliveries;$("#health-bar").style.width=`${Math.max(0,s.health*100)}%`;$("#health-bar").style.background=s.health<.3?"#ff5b70":"#6bd38d";},
-  perk:options=>{$("#perk-options").innerHTML=options.map((p,i)=>`<button class="perk" data-i="${i}" style="--delay:${i*90}ms"><span class="perk-glow"></span><span class="emoji">${p.emoji}</span><b>${p.name}</b><p>${p.desc}</p><mark>${i+1} TUŞU</mark></button>`).join("");show("#perk-screen");const buttons=[...$("#perk-options").querySelectorAll("button")];buttons.forEach((b,i)=>b.onclick=()=>choose(options[i],b));let active=true;const key=e=>{const i=Number(e.key)-1;if(options[i])choose(options[i],buttons[i])};addEventListener("keydown",key);function choose(p,button){if(!active)return;active=false;removeEventListener("keydown",key);button.classList.add("chosen");buttons.filter(b=>b!==button).forEach(b=>b.classList.add("dismissed"));setTimeout(()=>{show("none");game.choosePerk(p)},260);}},
-  perkChosen:renderPerks,
-  end:run=>{saveRun(run);document.body.classList.remove("game-running");$("#end-label").textContent=run.reason==="complete"?"TUR TAMAMLANDI":"ENERJİN BİTTİ";$("#end-score").textContent=`${run.score.toLocaleString("tr-TR")} puan`;$("#end-copy").textContent=run.reason==="complete"?"Şehrin üç dakikalık rush'ını atlattın!":"Trafik bu kez kazandı. Yeni bir build ile tekrar dene.";$("#run-stats").innerHTML=`<span><b>${run.deliveries}</b>Teslimat</span><span><b>${run.perks.length}</b>Güç</span><span><b>${formatTime(run.time)}</b>Süre</span>`;show("#end-screen");$("#hud").classList.add("hidden");}
+const audio = new SoundEngine();
+const player = getPlayerIdentity(arcadeStore),
+  playerNameInput = $("#player-name");
+playerNameInput.value = player.name;
+playerNameInput.readOnly = player.account;
+playerNameInput.title = player.account
+  ? "Hesap nickname'in kullanılıyor."
+  : "Misafir adı bu oturum için rastgele seçildi.";
+const defaults = [
+  { name: "Hızlı Panda", score: 4820, deliveries: 31, time: 180, perks: 5 },
+  { name: "Mor Şimşek", score: 4310, deliveries: 27, time: 180, perks: 5 },
+  { name: "Gece Kuryesi", score: 3890, deliveries: 24, time: 164, perks: 4 },
+  { name: "Rota Ustası", score: 3450, deliveries: 21, time: 151, perks: 4 },
+];
+const loadScores = () => {
+  try {
+    return JSON.parse(localStorage.getItem("getir-rush-scores")) || defaults;
+  } catch {
+    return defaults;
+  }
+};
+const saveRun = (run) => {
+  const scores = loadScores();
+  scores.push({
+    name: $("#player-name").value.trim() || "Anonim Kurye",
+    score: run.score,
+    deliveries: run.deliveries,
+    time: run.time,
+    perks: run.perks.length,
+    reason: run.reason,
+    date: Date.now(),
+  });
+  scores.sort((a, b) => b.score - a.score);
+  localStorage.setItem(
+    "getir-rush-scores",
+    JSON.stringify(scores.slice(0, 20)),
+  );
+  arcadeStore?.recordRun({
+    clientRunId: `rush-${run.seed}`,
+    gameId: "getir-rush",
+    score: run.score,
+    durationSeconds: run.time,
+    completedAt: new Date().toISOString(),
+    metrics: {
+      deliveries: run.deliveries,
+      perks: run.perks.length,
+      reason: run.reason,
+    },
+  });
+  renderScores();
+  syncPendingScores();
+};
+function renderScores(input = loadScores()) {
+  const scores = input
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
+  $("#leaderboard").innerHTML = scores
+    .map(
+      (s, i) =>
+        `<li><span class="rank">${i + 1}</span><div class="player-cell"><span class="avatar">${["🏆", "⚡", "🛵", "📦", "☕"][i % 5]}</span><div><b>${escapeHtml(s.name)}</b><small class="run-detail"><span>📦 ${s.deliveries ?? "—"} teslimat</span><span>⏱ ${Number.isFinite(s.time) ? formatTime(s.time) : "—"}</span><span>⚡ ${s.perks ?? "—"} güç</span></small></div></div><strong>${s.score.toLocaleString("tr-TR")}</strong></li>`,
+    )
+    .join("");
+}
+function renderPublicScores(rows) {
+  renderScores(
+    rows.map((row) => ({
+      name: row.nickname,
+      score: Number(row.score || 0),
+      deliveries: null,
+      time: null,
+      perks: null,
+    })),
+  );
+}
+async function refreshPublicScores() {
+  if (!backendAvailable) return;
+  try {
+    const rows = await getLeaderboard(
+      "getir-rush",
+      player.account ? player.name : "",
+    );
+    if (rows.length) renderPublicScores(rows);
+  } catch {}
+}
+function syncPendingScores() {
+  const pending = arcadeStore?.getSnapshot().outbox || [];
+  if (!pending.length) return;
+  syncRuns(pending)
+    .then(({ synced, rejected }) => {
+      arcadeStore.markSynced(synced, rejected);
+      refreshPublicScores();
+    })
+    .catch(() => {});
+}
+function escapeHtml(v) {
+  const d = document.createElement("div");
+  d.textContent = v;
+  return d.innerHTML;
+}
+function renderPerks(perks) {
+  $("#active-perks").innerHTML = perks.length
+    ? perks
+        .map(
+          (p, i) =>
+            `<div class="perk-pill"><span>${p.emoji}</span>${p.name}<b>${perks.filter((x) => x.id === p.id).length}x</b></div>`,
+        )
+        .join("")
+    : "<p>Henüz güç seçmedin.</p>";
+}
+const game = new RushGame($("#game"), {
+  sound: (name) => audio.play(name),
+  update: (s) => {
+    $("#time").textContent = formatTime(s.time);
+    $("#score").textContent = s.score.toLocaleString("tr-TR");
+    $("#deliveries").textContent = s.deliveries;
+    $("#health-bar").style.width = `${Math.max(0, s.health * 100)}%`;
+    $("#health-bar").style.background = s.health < 0.3 ? "#ff5b70" : "#6bd38d";
+  },
+  perk: (options) => {
+    $("#perk-options").innerHTML = options
+      .map(
+        (p, i) =>
+          `<button class="perk" data-i="${i}" style="--delay:${i * 90}ms"><span class="perk-glow"></span><span class="emoji">${p.emoji}</span><b>${p.name}</b><p>${p.desc}</p><mark>${i + 1} TUŞU</mark></button>`,
+      )
+      .join("");
+    show("#perk-screen");
+    const buttons = [...$("#perk-options").querySelectorAll("button")];
+    buttons.forEach((b, i) => (b.onclick = () => choose(options[i], b)));
+    let active = true;
+    const key = (e) => {
+      const i = Number(e.key) - 1;
+      if (options[i]) choose(options[i], buttons[i]);
+    };
+    addEventListener("keydown", key);
+    function choose(p, button) {
+      if (!active) return;
+      active = false;
+      removeEventListener("keydown", key);
+      button.classList.add("chosen");
+      buttons
+        .filter((b) => b !== button)
+        .forEach((b) => b.classList.add("dismissed"));
+      setTimeout(() => {
+        show("none");
+        game.choosePerk(p);
+      }, 260);
+    }
+  },
+  perkChosen: renderPerks,
+  end: (run) => {
+    saveRun(run);
+    document.body.classList.remove("game-running");
+    $("#end-label").textContent =
+      run.reason === "complete" ? "TUR TAMAMLANDI" : "ENERJİN BİTTİ";
+    $("#end-score").textContent = `${run.score.toLocaleString("tr-TR")} puan`;
+    $("#end-copy").textContent =
+      run.reason === "complete"
+        ? "Şehrin üç dakikalık rush'ını atlattın!"
+        : "Trafik bu kez kazandı. Yeni bir build ile tekrar dene.";
+    $("#run-stats").innerHTML =
+      `<span><b>${run.deliveries}</b>Teslimat</span><span><b>${run.perks.length}</b>Güç</span><span><b>${formatTime(run.time)}</b>Süre</span>`;
+    show("#end-screen");
+    $("#hud").classList.add("hidden");
+  },
 });
-function start(){if(portraitQuery.matches)return;audio.ensure();show("none");document.body.classList.add("game-running");$("#hud").classList.remove("hidden");renderPerks([]);game.start();}
-const portraitQuery=matchMedia("(pointer: coarse) and (orientation: portrait)");
-function syncOrientation(){document.body.classList.toggle("needs-landscape",portraitQuery.matches);game.setOrientationPaused(portraitQuery.matches&&game.running);}
-portraitQuery.addEventListener?.("change",syncOrientation);syncOrientation();
-const joystick=$("#joystick"),knob=joystick.querySelector(".joystick-knob");let joystickPointer=null;
-function moveJoystick(e){const r=joystick.getBoundingClientRect(),radius=r.width*.34,dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),distance=Math.hypot(dx,dy),scale=distance>radius?radius/distance:1,x=dx*scale,y=dy*scale,deadzone=radius*.14;knob.style.transform=`translate(${x}px,${y}px)`;game.setMovement(distance<deadzone?0:x/radius,distance<deadzone?0:y/radius);}
-function releaseJoystick(e){if(joystickPointer!==null&&e?.pointerId!==undefined&&e.pointerId!==joystickPointer)return;joystickPointer=null;knob.style.transform="translate(0,0)";game.setMovement();}
-joystick.addEventListener("pointerdown",e=>{joystickPointer=e.pointerId;joystick.setPointerCapture(e.pointerId);moveJoystick(e);});
-joystick.addEventListener("pointermove",e=>{if(e.pointerId===joystickPointer)moveJoystick(e);});
-joystick.addEventListener("pointerup",releaseJoystick);joystick.addEventListener("pointercancel",releaseJoystick);joystick.addEventListener("lostpointercapture",releaseJoystick);
-$("#start").onclick=start;$("#restart").onclick=start;$("#sound").onclick=e=>{const enabled=audio.toggle();e.currentTarget.textContent=enabled?"SES: AÇIK":"SES: KAPALI";e.currentTarget.setAttribute("aria-pressed",String(enabled));};renderScores();
+function start() {
+  if (portraitQuery.matches) return;
+  audio.ensure();
+  show("none");
+  document.body.classList.add("game-running");
+  $("#hud").classList.remove("hidden");
+  renderPerks([]);
+  game.start();
+}
+const portraitQuery = matchMedia(
+  "(pointer: coarse) and (orientation: portrait)",
+);
+function syncOrientation() {
+  document.body.classList.toggle("needs-landscape", portraitQuery.matches);
+  game.setOrientationPaused(portraitQuery.matches && game.running);
+}
+portraitQuery.addEventListener?.("change", syncOrientation);
+syncOrientation();
+const joystick = $("#joystick"),
+  knob = joystick.querySelector(".joystick-knob");
+let joystickPointer = null;
+function moveJoystick(e) {
+  const r = joystick.getBoundingClientRect(),
+    radius = r.width * 0.34,
+    dx = e.clientX - (r.left + r.width / 2),
+    dy = e.clientY - (r.top + r.height / 2),
+    distance = Math.hypot(dx, dy),
+    scale = distance > radius ? radius / distance : 1,
+    x = dx * scale,
+    y = dy * scale,
+    deadzone = radius * 0.14;
+  knob.style.transform = `translate(${x}px,${y}px)`;
+  game.setMovement(
+    distance < deadzone ? 0 : x / radius,
+    distance < deadzone ? 0 : y / radius,
+  );
+}
+function releaseJoystick(e) {
+  if (
+    joystickPointer !== null &&
+    e?.pointerId !== undefined &&
+    e.pointerId !== joystickPointer
+  )
+    return;
+  joystickPointer = null;
+  knob.style.transform = "translate(0,0)";
+  game.setMovement();
+}
+joystick.addEventListener("pointerdown", (e) => {
+  joystickPointer = e.pointerId;
+  joystick.setPointerCapture(e.pointerId);
+  moveJoystick(e);
+});
+joystick.addEventListener("pointermove", (e) => {
+  if (e.pointerId === joystickPointer) moveJoystick(e);
+});
+joystick.addEventListener("pointerup", releaseJoystick);
+joystick.addEventListener("pointercancel", releaseJoystick);
+joystick.addEventListener("lostpointercapture", releaseJoystick);
+$("#start").onclick = start;
+$("#restart").onclick = start;
+$("#sound").onclick = (e) => {
+  const enabled = audio.toggle();
+  e.currentTarget.textContent = enabled ? "SES: AÇIK" : "SES: KAPALI";
+  e.currentTarget.setAttribute("aria-pressed", String(enabled));
+};
+renderScores();
+refreshPublicScores();
+setInterval(refreshPublicScores, 15000);
