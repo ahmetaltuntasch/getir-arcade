@@ -61,7 +61,18 @@ async function renderLeaderboard() {
     paintLeaderboard(fallback, "YEREL");
   }
 }
+function syncPendingScores() {
+  const pending = arcadeStore?.getSnapshot().outbox || [];
+  if (!pending.length) return;
+  syncRuns(pending)
+    .then(({ synced, rejected }) => {
+      arcadeStore.markSynced(synced, rejected);
+      renderLeaderboard();
+    })
+    .catch(() => {});
+}
 renderLeaderboard();
+syncPendingScores();
 setInterval(renderLeaderboard, 15000);
 const audio = new GameAudio();
 const game = new DepoTetris(canvas, {
@@ -98,15 +109,7 @@ const game = new DepoTetris(canvas, {
         reason: result.reason,
       },
     });
-    const pending = arcadeStore?.getSnapshot().outbox || [];
-    if (pending.length) {
-      syncRuns(pending)
-        .then(({ synced, rejected }) => {
-          arcadeStore.markSynced(synced, rejected);
-          renderLeaderboard();
-        })
-        .catch(() => {});
-    }
+    syncPendingScores();
     const best = Math.max(
       result.score,
       Number(localStorage.getItem("depo-tetris-best") || 0),

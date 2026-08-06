@@ -335,5 +335,6 @@ $("#sound").onclick = (e) => {
   e.currentTarget.setAttribute("aria-pressed", String(enabled));
 };
 renderScores();
+syncPendingScores();
 refreshPublicScores();
 setInterval(refreshPublicScores, 15000);
