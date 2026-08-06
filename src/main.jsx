@@ -81,7 +81,19 @@ function GameCard({ game, stats, onPlay }) {
       className={`game-card ${!game.ready ? "locked" : ""}`}
       style={{ "--accent": game.color, "--ink": game.ink }}
     >
-      <div className="game-art">
+      <div
+        className="game-art"
+        role={game.ready ? "button" : undefined}
+        tabIndex={game.ready ? 0 : -1}
+        aria-label={game.ready ? `${game.name} oyununu aç` : undefined}
+        onClick={() => game.ready && onPlay(game)}
+        onKeyDown={(event) => {
+          if (game.ready && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            onPlay(game);
+          }
+        }}
+      >
         <img src={game.image} alt={`${game.name} oyun kapağı`} loading="lazy" />
         <span className="game-badge">{game.badge}</span>
         {!game.ready && <LockKeyhole className="lock" size={22} />}
