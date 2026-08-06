@@ -1,6 +1,7 @@
 import { RushGame } from "./game.js";
 import { formatTime } from "./core.js";
 import { arcadeStore } from "../../../shared/platform/store.js";
+import { getPlayerIdentity } from "../../../shared/platform/player.js";
 
 const $=s=>document.querySelector(s);const screens=["#start-screen","#perk-screen","#end-screen"];
 const show=id=>{screens.forEach(s=>$(s).classList.toggle("hidden",s!==id));};
@@ -12,6 +13,10 @@ class SoundEngine{
   toggle(){this.enabled=!this.enabled;if(this.enabled)this.play("start");return this.enabled;}
 }
 const audio=new SoundEngine();
+const player=getPlayerIdentity(arcadeStore),playerNameInput=$("#player-name");
+playerNameInput.value=player.name;
+playerNameInput.readOnly=player.account;
+playerNameInput.title=player.account?"Hesap nickname'in kullanılıyor.":"Misafir adı bu oturum için rastgele seçildi.";
 const defaults=[{name:"Hızlı Panda",score:4820,deliveries:31,time:180,perks:5},{name:"Mor Şimşek",score:4310,deliveries:27,time:180,perks:5},{name:"Gece Kuryesi",score:3890,deliveries:24,time:164,perks:4},{name:"Rota Ustası",score:3450,deliveries:21,time:151,perks:4}];
 const loadScores=()=>{try{return JSON.parse(localStorage.getItem("getir-rush-scores"))||defaults}catch{return defaults}};
 const saveRun=run=>{const scores=loadScores();scores.push({name:$("#player-name").value.trim()||"Anonim Kurye",score:run.score,deliveries:run.deliveries,time:run.time,perks:run.perks.length,reason:run.reason,date:Date.now()});scores.sort((a,b)=>b.score-a.score);localStorage.setItem("getir-rush-scores",JSON.stringify(scores.slice(0,20)));arcadeStore?.recordRun({clientRunId:`rush-${run.seed}`,gameId:'getir-rush',score:run.score,durationSeconds:run.time,completedAt:new Date().toISOString(),metrics:{deliveries:run.deliveries,perks:run.perks.length,reason:run.reason}});renderScores();};

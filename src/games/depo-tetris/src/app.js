@@ -1,7 +1,11 @@
 import { DepoTetris } from './game.js';
 import { GameAudio } from './audio.js';
 import { arcadeStore } from '../../../shared/platform/store.js';
+import { getPlayerIdentity } from '../../../shared/platform/player.js';
 const $=id=>document.getElementById(id);const canvas=$('game');
+const player=getPlayerIdentity(arcadeStore);
+const playerName=$('player-name');
+playerName.textContent=player.account?`OYUNCU · ${player.name}`:`MİSAFİR · ${player.name}`;
 const audio=new GameAudio();
 const game=new DepoTetris(canvas,{
   hud:s=>{$('time').textContent=s.time;$('score').textContent=s.score.toLocaleString('tr-TR');$('rows').textContent=s.rows;$('products').textContent=s.products;$('power').style.width=`${s.power*100}%`;},
