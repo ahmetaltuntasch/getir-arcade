@@ -2,18 +2,38 @@ import { DepoTetris } from './game.js';
 import { GameAudio } from './audio.js';
 import { arcadeStore } from '../../../shared/platform/store.js';
 import { getPlayerIdentity } from '../../../shared/platform/player.js';
+import { backendAvailable, getLeaderboard } from '../../../shared/platform/api.js';
 const $=id=>document.getElementById(id);const canvas=$('game');
 const player=getPlayerIdentity(arcadeStore);
 const playerName=$('player-name');
 playerName.value=player.name;
 playerName.title=player.account?"Hesap nickname'in kullanılıyor.":"Misafir adı bu oturum için rastgele seçildi.";
+const localLeaders=[
+  {nickname:'Raf Ustası',score:15840},{nickname:'Mor Picker',score:14320},
+  {nickname:'Koli Kaptanı',score:12750},{nickname:'Depo Şimşeği',score:11240},
+  {nickname:'Gece Vardiyası',score:9860}
+];
+const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+function paintLeaderboard(rows,status){
+  $('leaderboard-status').textContent=`● ${status}`;
+  $('leaderboard-status').classList.toggle('local',status!=='CANLI');
+  $('leaderboard').innerHTML=rows.slice(0,7).map((row,index)=>`<li class="${row.is_current?'is-current':''}"><span class="rank">${row.rank??index+1}</span><div class="player-cell"><span class="avatar">${['🏆','📦','⚡','🧱','✨'][index%5]}</span><div><b>${escapeHtml(row.nickname)}</b><small>Depo Tetris</small></div></div><strong>${Number(row.score||0).toLocaleString('tr-TR')}</strong></li>`).join('');
+}
+async function renderLeaderboard(){
+  const best=Number(localStorage.getItem('depo-tetris-best')||0);
+  const fallback=[...localLeaders,...(best?[{nickname:player.name,score:best,is_current:true}]:[])].sort((a,b)=>b.score-a.score).map((row,index)=>({...row,rank:index+1}));
+  paintLeaderboard(fallback,'YEREL');
+  if(!backendAvailable)return;
+  try{const leaders=await getLeaderboard('depo-tetris',player.account?player.name:'');if(leaders.length)paintLeaderboard(leaders,'CANLI');}catch{paintLeaderboard(fallback,'YEREL');}
+}
+renderLeaderboard();
 const audio=new GameAudio();
 const game=new DepoTetris(canvas,{
-  hud:s=>{$('time').textContent=s.time;$('score').textContent=s.score.toLocaleString('tr-TR');$('rows').textContent=s.rows;$('products').textContent=s.products;$('power').style.width=`${s.power*100}%`;},
+  hud:s=>{$('time').textContent=s.time;$('score').textContent=s.score.toLocaleString('tr-TR');$('rows').textContent=s.rows;$('products').textContent=`${s.products} ürün`;$('power').style.width=`${s.power*100}%`;},
   bonus:([name,copy])=>{audio.play('bonus');$('bonus-card').innerHTML=`<b>${name}</b><p>${copy}</p>`;},
   alert:text=>{$('bonus-card').innerHTML=`<b>⚠️ ${text}</b><p>Picker rafları kurtardı, devam!</p>`;},
   sound:name=>audio.play(name),
-  end:result=>{releaseJoystick();releaseKeyboard();document.body.classList.remove('game-running');arcadeStore?.recordRun({clientRunId:`depo-${Date.now()}-${result.score}`,gameId:'depo-tetris',score:result.score,durationSeconds:result.durationSeconds,completedAt:new Date().toISOString(),metrics:{rowsCleared:result.rowsCleared,productsCollected:result.productsCollected,bestCombo:result.bestCombo,reason:result.reason}});const best=Math.max(result.score,Number(localStorage.getItem('depo-tetris-best')||0));localStorage.setItem('depo-tetris-best',best);localStorage.setItem('getir-arcade-last-result',JSON.stringify({game:'depo-tetris',...result}));$('end-label').textContent=result.reason==='overflow'?'RAFLAR TAVANA ULAŞTI':'VARDİYA TAMAMLANDI';$('final-score').textContent=`${result.score.toLocaleString('tr-TR')} PUAN`;$('summary').innerHTML=`<span><b>${result.rowsCleared}</b>Toplanan raf</span><span><b>${result.productsCollected}</b>Ürün</span><span><b>x${result.bestCombo}</b>En iyi kombo</span><span><b>+${result.xp}</b>Arcade XP</span>`;$('end').classList.remove('hidden');$('hud').classList.add('hidden');}
+  end:result=>{releaseJoystick();releaseKeyboard();document.body.classList.remove('game-running');arcadeStore?.recordRun({clientRunId:`depo-${Date.now()}-${result.score}`,gameId:'depo-tetris',score:result.score,durationSeconds:result.durationSeconds,completedAt:new Date().toISOString(),metrics:{rowsCleared:result.rowsCleared,productsCollected:result.productsCollected,bestCombo:result.bestCombo,reason:result.reason}});const best=Math.max(result.score,Number(localStorage.getItem('depo-tetris-best')||0));localStorage.setItem('depo-tetris-best',best);renderLeaderboard();localStorage.setItem('getir-arcade-last-result',JSON.stringify({game:'depo-tetris',...result}));$('end-label').textContent=result.reason==='overflow'?'RAFLAR TAVANA ULAŞTI':'VARDİYA TAMAMLANDI';$('final-score').textContent=`${result.score.toLocaleString('tr-TR')} PUAN`;$('summary').innerHTML=`<span><b>${result.rowsCleared}</b>Toplanan raf</span><span><b>${result.productsCollected}</b>Ürün</span><span><b>x${result.bestCombo}</b>En iyi kombo</span><span><b>+${result.xp}</b>Arcade XP</span>`;$('end').classList.remove('hidden');$('hud').classList.add('hidden');}
 });
 function start(){if(portraitQuery.matches)return;audio.unlock();$('start').classList.add('hidden');$('end').classList.add('hidden');$('hud').classList.remove('hidden');document.body.classList.add('game-running');game.start();}
 $('start-button').addEventListener('click',start);$('restart').addEventListener('click',start);

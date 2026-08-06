@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="header-actions">
-          <a href="/" class="back">← ARCADE</a>
+          <a href="/" class="back">ARCADE</a>
           <button id="sound">SES: AÇIK</button>
         </div>
       </header>
@@ -44,14 +44,16 @@
             ><button data-action="drop" class="drop">BIRAK ↓</button>
           </div>
           <div id="start" class="overlay">
-            <div class="eyebrow">DEPO OPERASYONUNDA EN İYİ KİM?</div>
-            <h1>Rafları<br /><em>hazırla!</em></h1>
+            <div class="eyebrow">DEPO OPERASYONUNUN EN İYİSİ KİM?</div>
+            <h1>Depo <em>Tetris</em></h1>
             <p>
-              Ürünleri yerleştir, dolan rafları picker'larla siparişe gönder.
+              Kolileri yerleştir, rafları tamamla ve picker'larla depoyu
+              hızlandır.
             </p>
             <div class="how">
-              <span><b>← →</b> Hareket et</span><span><b>↓</b> Hızlandır</span
-              ><span><b>↑</b> Döndür</span><span><b>BOŞLUK</b> Bırak</span>
+              <span><b>OKLAR</b> Koliyi yönet</span
+              ><span><b>BOŞLUK</b> Hızlı bırak</span
+              ><span><b>3:00</b> Rafları tamamla</span>
             </div>
             <label
               >OYUNCU ADI<input
@@ -61,7 +63,7 @@
                 value="Misafir"
             /></label>
             <button id="start-button" class="primary">
-              VARDİYAYI BAŞLAT →
+              VARDİYAYA BAŞLA <span>→</span>
             </button>
           </div>
           <div id="end" class="overlay hidden">
@@ -72,16 +74,30 @@
           </div>
         </section>
         <aside>
-          <section class="panel bonus">
-            <small>AKTİF BONUS</small>
-            <div id="bonus-card">
-              <b>✨ Güç yükleniyor</b>
-              <p>Raf temizledikçe bonus kazan.</p>
+          <section class="panel leaderboard">
+            <div class="panel-head">
+              <div>
+                <small>HAFTALIK</small>
+                <h3>Liderlik Tablosu</h3>
+              </div>
+              <span id="leaderboard-status" class="live">● YÜKLENİYOR</span>
             </div>
+            <ol id="leaderboard"></ol>
           </section>
-          <section class="panel orders">
-            <small>TOPLANAN ÜRÜNLER</small><b id="products">0</b>
-            <p>Picker poşetleri bekliyor!</p>
+          <section class="panel shift-panel">
+            <small>BU VARDİYA</small>
+            <h3>Depo Durumu</h3>
+            <div class="shift-stat">
+              <span class="shift-icon">✨</span>
+              <div id="bonus-card">
+                <b>Güç yükleniyor</b>
+                <p>Raf temizledikçe bonus kazan.</p>
+              </div>
+            </div>
+            <div class="shift-stat products-stat">
+              <span class="shift-icon">📦</span>
+              <div><b id="products">0 ürün</b><p>Picker poşetleri bekliyor!</p></div>
+            </div>
           </section>
         </aside>
       </main>
