@@ -10,7 +10,7 @@ supabase link --project-ref PROJECT_REF
 supabase db push
 ```
 
-İki migration sırasıyla temel tabloları/RLS politikalarını ve atomik `submit_arcade_run` RPC'sini kurar. Leaderboard view'ları dışarıya yalnız `rank`, `nickname` ve `xp` ya da `score` alanlarını açar.
+Migration'lar temel tabloları/RLS politikalarını, atomik `submit_arcade_run` RPC'sini ve Auth kullanıcısıyla aynı işlemde çalışan profil oluşturma trigger'ını kurar. Leaderboard view'ları dışarıya yalnız `rank`, `nickname` ve `xp` ya da `score` alanlarını açar.
 
 ## 2. Edge Function secret'ları
 
