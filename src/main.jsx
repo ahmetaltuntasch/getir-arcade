@@ -37,7 +37,8 @@ import {
 } from "./shared/platform/api";
 
 const nf = new Intl.NumberFormat("tr-TR");
-const labels = { "getir-rush": "Getir Rush", "depo-tetris": "Depo Tetris" };
+const labels = Object.fromEntries(games.map((game) => [game.id, game.name]));
+const gameEmoji = { "getir-rush": "🛵", "depo-tetris": "📦", "televole-wars": "📺" };
 let syncing = false;
 async function syncPendingRuns() {
   if (syncing || !backendAvailable) return;
@@ -574,8 +575,8 @@ function App() {
           <div>
             <Star />
             <span>
-              <small>EN İYİ DEPO</small>
-              <b>{nf.format(state.gameStats["depo-tetris"].bestScore)}</b>
+              <small>EN İYİ TELEVOLE</small>
+              <b>{nf.format(state.gameStats["televole-wars"].bestScore)}</b>
             </span>
           </div>
           <div>
@@ -643,6 +644,7 @@ function App() {
                 ["season", "Arcade XP"],
                 ["getir-rush", "Rush"],
                 ["depo-tetris", "Depo"],
+                ["televole-wars", "Televole"],
               ].map(([id, label]) => (
                 <button
                   className={leaderTab === id ? "active" : ""}
@@ -708,7 +710,7 @@ function App() {
             {recent.map((run) => (
               <div className="activity-row" key={run.clientRunId}>
                 <span className="activity-icon">
-                  {run.gameId === "getir-rush" ? "🛵" : "📦"}
+                  {gameEmoji[run.gameId] || "🎮"}
                 </span>
                 <div>
                   <b>{labels[run.gameId]}</b>

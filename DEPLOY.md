@@ -27,7 +27,7 @@ pnpm run build
 Deploy sonrasında şunları doğrulayın:
 
 - `/` portalı açılır.
-- `/games/getir-rush/` ve `/games/depo-tetris/` doğrudan açılır ve sayfa yenilenebilir.
+- `/games/getir-rush/`, `/games/depo-tetris/` ve `/games/televole-wars/` doğrudan açılır ve sayfa yenilenebilir.
 - Eski `/src/games/.../index.html` adresleri temiz oyun adreslerine yönlenir.
 - Misafir oyuncu çevrimdışı oynayabilir.
 - Yeni hesap açılır, bekleyen misafir turları senkronize olur ve ortak lig görünür.

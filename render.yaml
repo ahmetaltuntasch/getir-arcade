@@ -12,6 +12,9 @@ services:
       - type: redirect
         source: /src/games/depo-tetris/index.html
         destination: /games/depo-tetris/
+      - type: redirect
+        source: /src/games/televole-wars/index.html
+        destination: /games/televole-wars/
       - type: rewrite
         source: /*
         destination: /index.html

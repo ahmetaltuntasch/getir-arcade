@@ -1,8 +1,10 @@
 import { Map, ShoppingBasket } from 'lucide-react';
 import { getirRush } from './getir-rush-meta';
 import { depoTetris } from './depo-tetris-meta';
+import { televoleWars } from './televole-wars-meta';
 
 export const games = [
+  televoleWars,
   getirRush,
   depoTetris,
   {

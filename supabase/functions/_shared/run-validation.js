@@ -1,6 +1,7 @@
 const limits={
   'getir-rush':{score:25000,duration:180,metrics:{deliveries:80,perks:12}},
   'depo-tetris':{score:50000,duration:180,metrics:{rowsCleared:80,productsCollected:1000,bestCombo:80}},
+  'televole-wars':{score:100000,duration:90,metrics:{headlines:500,bestCombo:500,bursts:20}},
 };
 const integer=(value,min,max)=>Number.isInteger(value)&&value>=min&&value<=max;
 
@@ -18,9 +19,12 @@ export function validateRun(input,now=Date.now()){
   if(gameId==='getir-rush'){
     if(!['complete','energy'].includes(metrics.reason)||metrics.reason==='complete'&&durationSeconds<178)return{ok:false,error:'Tur süresi sonuçla uyuşmuyor'};
     if(score<metrics.deliveries*100)return{ok:false,error:'Skor teslimatlarla uyuşmuyor'};
-  }else{
+  }else if(gameId==='depo-tetris'){
     if(!['time','overflow'].includes(metrics.reason)||metrics.reason==='time'&&durationSeconds<178)return{ok:false,error:'Tur süresi sonuçla uyuşmuyor'};
     if(metrics.productsCollected<metrics.rowsCleared*10)return{ok:false,error:'Raf ve ürün sayısı uyuşmuyor'};
+  }else{
+    if(!['time','energy'].includes(metrics.reason)||metrics.reason==='time'&&durationSeconds<88)return{ok:false,error:'Tur süresi sonuçla uyuşmuyor'};
+    if(score<metrics.headlines*60||metrics.bestCombo>metrics.headlines)return{ok:false,error:'Skor manşetlerle uyuşmuyor'};
   }
   return{ok:true,value:{clientRunId,gameId,score,durationSeconds,completedAt:completedAt.toISOString(),metrics}};
 }
