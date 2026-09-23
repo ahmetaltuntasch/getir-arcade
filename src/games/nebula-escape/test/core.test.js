@@ -7,18 +7,18 @@ test('difficulty rises in readable 15 second waves', () => {
   assert.equal(difficultyAt(89).wave, 6);
   assert.ok(difficultyAt(89).spawnEvery < difficultyAt(0).spawnEvery);
 });
-test('combo and prime time increase a kill score', () => {
-  assert.equal(calculateKillScore('rumor', 1, false), 80);
-  assert.ok(calculateKillScore('rumor', 10, true) > 200);
+test('combo and hyperdrive increase a kill score', () => {
+  assert.equal(calculateKillScore('drone', 1, false), 80);
+  assert.ok(calculateKillScore('drone', 10, true) > 200);
 });
 test('enemy selection unlocks tougher types over time', () => {
-  assert.equal(enemyTypeFor(0, 0), 'rumor');
-  assert.equal(enemyTypeFor(20, .2), 'paparazzi');
-  assert.equal(enemyTypeFor(50, .2), 'troll');
-  assert.equal(enemyTypeFor(80, .02), 'finale');
+  assert.equal(enemyTypeFor(0, 0), 'drone');
+  assert.equal(enemyTypeFor(20, .2), 'comet');
+  assert.equal(enemyTypeFor(50, .2), 'hunter');
+  assert.equal(enemyTypeFor(80, .02), 'overlord');
 });
 test('time and xp stay bounded', () => {
   assert.equal(formatTime(90), '01:30');
   assert.equal(formatTime(-3), '00:00');
-  assert.equal(resultXp({ score: 999999, headlines: 999 }), 400);
+  assert.equal(resultXp({ score: 999999, threats: 999 }), 400);
 });

@@ -1,7 +1,7 @@
 const limits={
   'getir-rush':{score:25000,duration:180,metrics:{deliveries:80,perks:12}},
   'depo-tetris':{score:50000,duration:180,metrics:{rowsCleared:80,productsCollected:1000,bestCombo:80}},
-  'televole-wars':{score:100000,duration:90,metrics:{headlines:500,bestCombo:500,bursts:20}},
+  'nebula-escape':{score:100000,duration:90,metrics:{threats:500,bestCombo:500,jumps:20}},
 };
 const integer=(value,min,max)=>Number.isInteger(value)&&value>=min&&value<=max;
 
@@ -24,7 +24,7 @@ export function validateRun(input,now=Date.now()){
     if(metrics.productsCollected<metrics.rowsCleared*10)return{ok:false,error:'Raf ve ürün sayısı uyuşmuyor'};
   }else{
     if(!['time','energy'].includes(metrics.reason)||metrics.reason==='time'&&durationSeconds<88)return{ok:false,error:'Tur süresi sonuçla uyuşmuyor'};
-    if(score<metrics.headlines*60||metrics.bestCombo>metrics.headlines)return{ok:false,error:'Skor manşetlerle uyuşmuyor'};
+    if(score<metrics.threats*60||metrics.bestCombo>metrics.threats)return{ok:false,error:'Skor tehditlerle uyuşmuyor'};
   }
   return{ok:true,value:{clientRunId,gameId,score,durationSeconds,completedAt:completedAt.toISOString(),metrics}};
 }

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#281044" />
+    <title>Nebula Escape · Getir Arcade</title>
+    <link rel="stylesheet" href="/src/games/nebula-escape/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="brand"><span>g!</span><div><b>NEBULA ESCAPE</b><small>Derin uzay arenası</small></div></div>
+        <div class="header-actions"><a href="/">← ARCADE</a><button id="sound">SES: AÇIK</button></div>
+      </header>
+      <main>
+        <section class="game-card">
+          <div id="hud" class="hud hidden">
+            <div><small>SÜRE</small><b id="time">01:30</b></div>
+            <div><small>SKOR</small><b id="score">0</b></div>
+            <div><small>TEHDİT</small><b id="threats">0</b></div>
+            <div><small>KOMBO</small><b id="combo">x0</b></div>
+            <div class="meter energy"><small>ENERJİ</small><span><i id="energy"></i></span></div>
+          </div>
+          <canvas id="game" width="960" height="600" aria-label="Nebula Escape oyun alanı"></canvas>
+          <div id="joystick" class="joystick" aria-label="Hareket kontrolü"><span></span></div>
+          <button id="burst" class="burst-button" disabled><span>⚡</span> HİPER!</button>
+          <div id="start" class="overlay">
+            <span class="eyebrow">HİPER KAPI KAPANMADAN…</span>
+            <h1>Nebula <em>Escape</em></h1>
+            <p>Uzay sürüleri çevreni sarıyor. Hareket et, otomatik lazerlerle rotanı aç ve enerji dolunca hiper atlayış yap.</p>
+            <div class="how"><span><b>WASD</b> Hareket et</span><span><b>OTOMATİK</b> Hedef al</span><span><b>BOŞLUK</b> Hiper atla</span><span><b>1:30</b> Nebuladan kaç</span></div>
+            <label>OYUNCU ADI<input id="player-name" maxlength="20" readonly value="Misafir" /></label>
+            <button id="start-button" class="primary">KAÇIŞI BAŞLAT <span>→</span></button>
+          </div>
+          <div id="end" class="overlay hidden">
+            <span id="end-label" class="eyebrow">NEBULADAN KAÇTIN</span>
+            <h2 id="final-score">0 PUAN</h2>
+            <p id="end-copy">Güvenli sektör seni bekliyor.</p>
+            <div id="summary" class="summary"></div>
+            <button id="restart" class="primary">YENİ ROTA AÇ <span>↻</span></button>
+          </div>
+        </section>
+        <aside>
+          <section class="panel leaderboard">
+            <div class="panel-head"><div><small>DERİN UZAY</small><h3>Liderlik Tablosu</h3></div><span id="leaderboard-status" class="live">● YÜKLENİYOR</span></div>
+            <ol id="leaderboard"></ol>
+          </section>
+          <section class="panel studio-panel">
+            <small>UÇUŞ VERİSİ</small><h3>Gemi Durumu</h3>
+            <div class="studio-stat"><span>📡</span><div><b id="wave">Dalga 1</b><p>Uzay sürüsü yoğunlaşıyor.</p></div></div>
+            <div class="studio-stat hyper-card"><span>⚡</span><div><b id="hyper">Hiper yük hazırlanıyor</b><p>Tehditleri dağıttıkça motor dolar.</p></div></div>
+          </section>
+          <section class="tip"><b>İPUCU</b><p>Kombo sayacını korumak için tehditler arasında 2 saniyeden fazla bekleme.</p></section>
+        </aside>
+      </main>
+    </div>
+    <div id="orientation" class="orientation"><div>↻</div><b>Telefonunu yatay çevir</b><p>Nebuladan kaçış yatay ekranda daha iyi görünür.</p></div>
+    <script type="module" src="/src/games/nebula-escape/src/app.js"></script>
+  </body>
+</html>

@@ -1,6 +1,6 @@
--- Publish Televole Wars as a first-class Arcade game.
+-- Publish Nebula Escape as a first-class Arcade game.
 alter table public.runs drop constraint if exists runs_game_id_check;
-alter table public.runs add constraint runs_game_id_check check(game_id in('getir-rush','depo-tetris','televole-wars'));
+alter table public.runs add constraint runs_game_id_check check(game_id in('getir-rush','depo-tetris','nebula-escape'));
 
 create or replace function public.submit_arcade_run(
   p_user_id uuid,
@@ -31,7 +31,7 @@ begin
   v_xp := least(400, case
     when p_game_id='getir-rush' then 50+coalesce((p_metrics->>'deliveries')::integer,0)*5+floor(p_score/100.0)::integer
     when p_game_id='depo-tetris' then 50+coalesce((p_metrics->>'rowsCleared')::integer,0)*15+floor(p_score/100.0)::integer
-    when p_game_id='televole-wars' then 50+coalesce((p_metrics->>'headlines')::integer,0)*3+floor(p_score/100.0)::integer
+    when p_game_id='nebula-escape' then 50+coalesce((p_metrics->>'threats')::integer,0)*3+floor(p_score/100.0)::integer
     else 50+floor(p_score/100.0)::integer end);
 
   insert into public.runs(user_id,client_run_id,game_id,score,xp,duration_seconds,metrics,completed_at)
@@ -69,8 +69,8 @@ $$;
 revoke all on function public.submit_arcade_run(uuid,text,text,integer,integer,jsonb,timestamptz) from public,anon,authenticated;
 grant execute on function public.submit_arcade_run(uuid,text,text,integer,integer,jsonb,timestamptz) to service_role;
 
-drop view if exists public.televole_leaderboard;
-create view public.televole_leaderboard with(security_invoker=false) as
+drop view if exists public.nebula_leaderboard;
+create view public.nebula_leaderboard with(security_invoker=false) as
 select row_number() over(order by max(r.score) desc,p.nickname asc)::integer rank,p.nickname,max(r.score)::bigint score
-from public.profiles p join public.runs r on r.user_id=p.id and r.game_id='televole-wars' group by p.id,p.nickname;
-grant select on public.televole_leaderboard to anon,authenticated;
+from public.profiles p join public.runs r on r.user_id=p.id and r.game_id='nebula-escape' group by p.id,p.nickname;
+grant select on public.nebula_leaderboard to anon,authenticated;

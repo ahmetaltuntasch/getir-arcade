@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test src/shared/platform/store.test.js && node --test supabase/functions/_shared/run-validation.test.js && node --test src/games/getir-rush/test/core.test.js && node --test src/games/depo-tetris/test/core.test.js && node --test src/games/televole-wars/test/core.test.js"
+    "test": "node --test src/shared/platform/store.test.js && node --test supabase/functions/_shared/run-validation.test.js && node --test src/games/getir-rush/test/core.test.js && node --test src/games/depo-tetris/test/core.test.js && node --test src/games/nebula-escape/test/core.test.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

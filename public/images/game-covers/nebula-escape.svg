@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Nebula Escape oyun kapağı</title>
+  <desc id="desc">Renkli bir nebuladan hiper kapıya kaçan küçük uzay gemisi</desc>
+  <defs>
+    <radialGradient id="space"><stop stop-color="#6e257f"/><stop offset=".5" stop-color="#28104f"/><stop offset="1" stop-color="#08051b"/></radialGradient>
+    <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ff4f9a" stop-opacity="0"/><stop offset="1" stop-color="#ffd300"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="13" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#060313" flood-opacity=".7"/></filter>
+  </defs>
+  <rect width="1200" height="800" fill="url(#space)"/>
+  <g fill="#fff" opacity=".75"><circle cx="90" cy="110" r="3"/><circle cx="185" cy="280" r="5"/><circle cx="330" cy="80" r="2"/><circle cx="438" cy="210" r="4"/><circle cx="610" cy="72" r="3"/><circle cx="718" cy="175" r="2"/><circle cx="890" cy="88" r="5"/><circle cx="1090" cy="220" r="3"/><circle cx="1010" cy="390" r="2"/><circle cx="155" cy="500" r="3"/><circle cx="790" cy="500" r="4"/></g>
+  <g opacity=".24" fill="none" stroke="#cbb5ff"><path d="M-80 710Q370 240 1280 540" stroke-width="5"/><path d="M-40 760Q400 310 1250 620" stroke-width="3"/><ellipse cx="970" cy="300" rx="210" ry="90" stroke-width="18"/></g>
+  <g transform="translate(925 292)" filter="url(#glow)"><ellipse rx="132" ry="205" fill="none" stroke="#4ee5c4" stroke-width="22"/><ellipse rx="98" ry="165" fill="#4ee5c4" opacity=".14"/><path d="M0-160v320M-72-115l144 230M72-115-72 115" stroke="#fff" stroke-width="3" opacity=".5"/></g>
+  <g transform="translate(600 360) rotate(-8)" filter="url(#shadow)"><path d="M-270 22H-58" stroke="url(#trail)" stroke-width="30" stroke-linecap="round"/><path d="M-80 0 42-82 112-42 178 0 112 42 42 82z" fill="#f8fbff" stroke="#bca7ff" stroke-width="8"/><path d="M24-48 88-22 88 22 24 48z" fill="#5d2d91"/><circle cx="34" r="21" fill="#4ee5c4"/><path d="M-62-17-108-60-90-3-108 56-58 17z" fill="#ff4f9a"/><path d="M178 0 118-14v28z" fill="#ffd300"/></g>
+  <g transform="translate(274 305)" fill="#ffcf56" stroke="#fff2aa" stroke-width="5"><path d="m0-44 12 30 34 2-26 21 8 33L0 24l-28 18 8-33-26-21 34-2z"/><path transform="translate(-118 92) scale(.55)" d="m0-44 12 30 34 2-26 21 8 33L0 24l-28 18 8-33-26-21 34-2z"/></g>
+  <g fill="#fff" filter="url(#shadow)"><text x="72" y="648" font-family="Arial Black,Arial,sans-serif" font-size="94" letter-spacing="-5">NEBULA</text><text x="72" y="746" font-family="Arial Black,Arial,sans-serif" font-size="112" fill="#ffd300" letter-spacing="-7">ESCAPE</text></g>
+  <g transform="translate(1052 665)"><circle r="64" fill="#5d2d91" stroke="#fff" stroke-width="7"/><text y="13" text-anchor="middle" fill="#ffd300" font-family="Arial Black,Arial,sans-serif" font-size="38">g!</text></g>
+</svg>

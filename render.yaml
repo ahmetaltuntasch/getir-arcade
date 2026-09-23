@@ -14,7 +14,13 @@ services:
         destination: /games/depo-tetris/
       - type: redirect
         source: /src/games/televole-wars/index.html
-        destination: /games/televole-wars/
+        destination: /games/nebula-escape/
+      - type: redirect
+        source: /games/televole-wars/
+        destination: /games/nebula-escape/
+      - type: redirect
+        source: /src/games/nebula-escape/index.html
+        destination: /games/nebula-escape/
       - type: rewrite
         source: /*
         destination: /index.html

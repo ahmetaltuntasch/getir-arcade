@@ -38,7 +38,7 @@ import {
 
 const nf = new Intl.NumberFormat("tr-TR");
 const labels = Object.fromEntries(games.map((game) => [game.id, game.name]));
-const gameEmoji = { "getir-rush": "🛵", "depo-tetris": "📦", "televole-wars": "📺" };
+const gameEmoji = { "getir-rush": "🛵", "depo-tetris": "📦", "nebula-escape": "🚀" };
 let syncing = false;
 async function syncPendingRuns() {
   if (syncing || !backendAvailable) return;
@@ -575,8 +575,8 @@ function App() {
           <div>
             <Star />
             <span>
-              <small>EN İYİ TELEVOLE</small>
-              <b>{nf.format(state.gameStats["televole-wars"].bestScore)}</b>
+              <small>EN İYİ NEBULA</small>
+              <b>{nf.format(state.gameStats["nebula-escape"].bestScore)}</b>
             </span>
           </div>
           <div>
@@ -644,7 +644,7 @@ function App() {
                 ["season", "Arcade XP"],
                 ["getir-rush", "Rush"],
                 ["depo-tetris", "Depo"],
-                ["televole-wars", "Televole"],
+                ["nebula-escape", "Nebula"],
               ].map(([id, label]) => (
                 <button
                   className={leaderTab === id ? "active" : ""}
