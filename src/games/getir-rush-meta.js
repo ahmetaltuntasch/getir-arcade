@@ -8,7 +8,7 @@ export const getirRush = {
   color: '#ffd300',
   ink: '#2f2157',
   icon: Flame,
-  image: '/images/game-covers/getir-rush.jpg',
+  image: '/images/game-covers/getir-rush.svg',
   ready: true,
   badge: 'ŞİMDİ OYNA',
   route: '/games/getir-rush/',
