@@ -19,7 +19,8 @@ export const games = [
   },
   {
     id: 'televole-wars', name: 'Televole Wars', type: 'Kart Savaşı',
-    description: 'Kartlarını diz, ekranın yıldızlarını karşı karşıya getir.', color: '#ff4f9a',
-    ink: '#3a1230', icon: Swords, image: '/images/game-covers/televole-wars.svg', ready: false, badge: 'YAKINDA',
+    description: 'Kadronu kur, sezonu oyna ve prime time ringine çık.', color: '#ff4f9a',
+    ink: '#3a1230', icon: Swords, image: '/images/game-covers/televole-wars.svg', ready: true, badge: 'OYNA',
+    route: '/games/televole-wars/',
   },
 ];
